@@ -1,0 +1,8 @@
+{
+  "name": "q2g-selection",
+  "version": "1.0.0",
+  "devDependencies": {
+    "@types/angular": "^1.5.20",
+    "@types/qlik-visualizationextensions": "^3.2.3"
+  }
+}
