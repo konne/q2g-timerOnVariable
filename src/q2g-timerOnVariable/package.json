@@ -1,8 +1,11 @@
 {
-  "name": "q2g-selection",
-  "version": "1.0.0",
-  "devDependencies": {
-    "@types/angular": "^1.5.20",
-    "@types/qlik-visualizationextensions": "^3.2.3"
-  }
+    "name": "q2g-timerOnVariable",
+    "description": "Qlik Sense Extension that changes a variable with a time",
+    "repository": "https://github.com/konne/q2g-timerOnVariable",
+    "license": "MIT",
+    "version": "1.0.0",
+    "devDependencies": {
+        "@types/angular": "^1.5.20",
+        "@types/qlik-visualizationextensions": "^3.2.3"
+    }
 }
