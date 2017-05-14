@@ -22,19 +22,23 @@ class DefinitionObject {
         items: {
             options: {
                 type: "items",
-                label: "Shortcut",
+                label: "Config",
                 items: {
-                    textVariable: {
-                        ref: "properties.textVariable",
-                        label: "Variable",
-                        type: "string",
-                        defaultValue: "timerVariable"
+                    variableName: {
+                        ref: "properties.variableName",
+                        label: "Variable Name",
+                        type: "string"                        
                     },
-                    numTimer: {
-                        ref: "properties.numTimer",
-                        label: "Timer",
+                    variableExpression: {
+                        ref: "properties.variableExpression",
+                        label: "Variable Expression",
+                        type: "string"
+                    },
+                    timerValue: {
+                        ref: "properties.timerValue",
+                        label: "Timer (ms)",
                         type: "string",
-                        defaultValue: "1000"
+                        defaultValue: "5000"
                     }
                 }
             }
@@ -49,22 +53,20 @@ class TimerOnVariableExtension {
 
     logger: Logging.Logger = new Logging.Logger("TimerOnVariableExtension");
 
-    constructor(enigmaRoot: Enigma.IGenericObject) {
-        logger.debug("Constructor of Class: KeycodeGeneratorExtension");
+    constructor(extensionObject: Enigma.IGenericObject) {
+        logger.debug("Constructor of Class: TimerOnVariableExtension");
+        
+        this.app = extensionObject.app;
 
-        this.enigmaRoot = enigmaRoot;
-        this.enigmaModel = enigmaRoot.app;
-
-        this.enigmaRoot.on("changed", () => {
-            this.extensionObjectChanged(this.enigmaRoot);
-        });
-        this.extensionObjectChanged(this.enigmaRoot);
+        let that = this;
+        extensionObject.on("changed", function() { that.extensionObjectChanged(this); });
+        this.extensionObjectChanged(extensionObject);
     }
 
-    enigmaModel: Enigma.IApp;
-    enigmaRoot: Enigma.IGenericObject;
+    app: Enigma.IApp;    
 
-    textVariable: string;
+    variableName: string;
+    variableExpression: string;
 
     private timerHandle: number;
     private _timerValue: number = 0;
@@ -85,15 +87,21 @@ class TimerOnVariableExtension {
 
     private timerElapsed(): void {
         this.logger.trace("Timer called");
-        this.enigmaModel
-            .getVariableByName(this.textVariable)
+        this.app
+            .getVariableByName(this.variableName)
             .then((res: Enigma.IGenericVariable) => {
                 if (res !== null) {
-                    let t: Date = new Date();
-                    res.setStringValue(t.toLocaleTimeString().toString())
+                    this.app.evaluateEx(this.variableExpression)
+                        .then((resEval) => {
+
+                            res.setStringValue(resEval.qText)
+                                .catch((e: any) => {
+                                    this.logger.error("error", e);
+                                });
+                        })
                         .catch((e: any) => {
                             this.logger.error("error", e);
-                        });
+                        });                    
                 }
             })
             .catch((e: any) => {
@@ -104,8 +112,9 @@ class TimerOnVariableExtension {
     private extensionObjectChanged(obj: Enigma.IGenericObject): void {
         try {
             obj.getLayout().then((res: Enigma.IGenericObjectProperties) => {
-                this.textVariable = res.properties.textVariable;
-                this.timerValue = parseInt(res.properties.numTimer, 10);
+                this.variableName = res.properties.variableName;
+                this.variableExpression = res.properties.variableExpression;
+                this.timerValue = parseInt(res.properties.timerValue, 10);
             });
         } catch (e) {
             this.logger.error("error in SelectionExtension class in function extensionObjectChanged", e);

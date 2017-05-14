@@ -139,6 +139,6 @@
     <CreateItem Include=".\bin\debug\**\*.*">
       <Output ItemName="ZipFiles" TaskParameter="Include" />
     </CreateItem>
-    <Zip ZipFileName=".\bin\release.zip" WorkingDirectory=".\bin\debug\" Files="@(ZipFiles)" />
+    <Zip ZipFileName=".\bin\$(ProjectName).zip" WorkingDirectory=".\bin\debug\" Files="@(ZipFiles)" />
   </Target>
 </Project>
