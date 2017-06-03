@@ -27,7 +27,7 @@ class DefinitionObject {
                     variableName: {
                         ref: "properties.variableName",
                         label: "Variable Name",
-                        type: "string"                        
+                        type: "string"
                     },
                     variableExpression: {
                         ref: "properties.variableExpression",
@@ -53,9 +53,9 @@ class TimerOnVariableExtension {
 
     logger: Logging.Logger = new Logging.Logger("TimerOnVariableExtension");
 
-    constructor(extensionObject: Enigma.IGenericObject) {
+    constructor(extensionObject: EngineAPI.IGenericObject) {
         logger.debug("Constructor of Class: TimerOnVariableExtension");
-        
+
         this.app = extensionObject.app;
 
         let that = this;
@@ -63,7 +63,7 @@ class TimerOnVariableExtension {
         this.extensionObjectChanged(extensionObject);
     }
 
-    app: Enigma.IApp;    
+    app: EngineAPI.IApp;
 
     variableName: string;
     variableExpression: string;
@@ -89,7 +89,7 @@ class TimerOnVariableExtension {
         this.logger.trace("Timer called");
         this.app
             .getVariableByName(this.variableName)
-            .then((res: Enigma.IGenericVariable) => {
+            .then((res: EngineAPI.IGenericVariable) => {
                 if (res !== null) {
                     this.app.evaluateEx(this.variableExpression)
                         .then((resEval) => {
@@ -101,7 +101,7 @@ class TimerOnVariableExtension {
                         })
                         .catch((e: any) => {
                             this.logger.error("error", e);
-                        });                    
+                        });
                 }
             })
             .catch((e: any) => {
@@ -109,9 +109,9 @@ class TimerOnVariableExtension {
             });
     }
 
-    private extensionObjectChanged(obj: Enigma.IGenericObject): void {
+    private extensionObjectChanged(obj: EngineAPI.IGenericObject): void {
         try {
-            obj.getLayout().then((res: Enigma.IGenericObjectProperties) => {
+            obj.getLayout().then((res: EngineAPI.IGenericObjectProperties) => {
                 this.variableName = res.properties.variableName;
                 this.variableExpression = res.properties.variableExpression;
                 this.timerValue = parseInt(res.properties.timerValue, 10);
@@ -132,13 +132,13 @@ export = {
     template: template,
     controller: ["$scope", function (
         scope: IVMScope<TimerOnVariableExtension>, element: JQuery): void {
-        let enigmaRoot: Enigma.IGenericObject = (scope.component.model as any) as Enigma.IGenericObject;
-        if ((scope.component.model as any).enigmaModel) {
-            // pre 3.2 SR3 enigma is in a subvariable of model
-            enigmaRoot = (scope.component.model as any).enigmaModel as Enigma.IGenericObject;
+        let EngineAPIRoot: EngineAPI.IGenericObject = (scope.component.model as any) as EngineAPI.IGenericObject;
+        if ((scope.component.model as any).EngineAPIModel) {
+            // pre 3.2 SR3 EngineAPI is in a subvariable of model
+            EngineAPIRoot = (scope.component.model as any).EngineAPIModel as EngineAPI.IGenericObject;
         }
 
-        let te: TimerOnVariableExtension = new TimerOnVariableExtension(enigmaRoot);
+        let te: TimerOnVariableExtension = new TimerOnVariableExtension(EngineAPIRoot);
         scope.vm = te;
         scope.$on("$destroy", () => {
             logger.trace("destroy of scope");
